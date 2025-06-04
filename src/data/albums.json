@@ -1,0 +1,22 @@
+[
+  {
+    "id": "album1",
+    "title": "Jazz Classics",
+    "artist": "John Doe",
+    "cover": "https://via.placeholder.com/300x300.png?text=Album+1",
+    "description": "A cool jazz album featuring classics.",
+    "track1": "/sample1.mp3",
+    "track2": "/sample2.mp3",
+    "comment": "I love the smooth melodies."
+  },
+  {
+    "id": "album2",
+    "title": "Rock Hits",
+    "artist": "Jane Smith",
+    "cover": "https://via.placeholder.com/300x300.png?text=Album+2",
+    "description": "Hard hitting rock music.",
+    "track1": "/sample3.mp3",
+    "track2": "/sample4.mp3",
+    "comment": "Great energy!"
+  }
+]
