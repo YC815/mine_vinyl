@@ -1,22 +1,26 @@
 [
   {
     "id": "album1",
-    "title": "Jazz Classics",
-    "artist": "John Doe",
-    "cover": "https://via.placeholder.com/300x300.png?text=Album+1",
+    "title": "Benny Goodman And The Giants Of Swing",
+    "artist": "Benny Goodman And The Giants Of Swing With Gene Krupa And Joe Venuti",
+    "cover": "/vinyl/album1/cover.jpg",
     "description": "A cool jazz album featuring classics.",
-    "track1": "/sample1.mp3",
-    "track2": "/sample2.mp3",
+    "track1": "/vinyl/album1/TexasTeaParty.mp3",
+    "source1": "https://www.youtube.com/watch?v=mpZLa7E9XXg",
+    "track2": "/vinyl/album1/AintChaGlad.mp3",
+    "source2": "https://www.youtube.com/watch?v=n1hjxKwT3ck",
     "comment": "I love the smooth melodies."
   },
   {
     "id": "album2",
-    "title": "Rock Hits",
-    "artist": "Jane Smith",
-    "cover": "https://via.placeholder.com/300x300.png?text=Album+2",
+    "title": "Herd At Montreux",
+    "artist": "Woody Herman",
+    "cover": "/vinyl/album2/cover.jpg",
     "description": "Hard hitting rock music.",
-    "track1": "/sample3.mp3",
-    "track2": "/sample4.mp3",
+    "track1": "/vinyl/album2/ICantGetNextToYou.mp3",
+    "source1": "https://www.youtube.com/watch?v=zEDN9ZfmfDo",
+    "track2": "/vinyl/album2/Superstar.mp3",
+    "source2": "https://www.youtube.com/watch?v=xI__lJbhB90",
     "comment": "Great energy!"
   }
 ]
