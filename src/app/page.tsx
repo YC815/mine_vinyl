@@ -3,6 +3,10 @@ import { useState, useEffect } from 'react';
 import albums from '@/data/albums.json';
 import AlbumCard, { Album } from '@/components/AlbumCard';
 import VinylPlayer from '@/components/VinylPlayer';
+import {
+  Dialog,
+  DialogContent,
+} from '@/components/ui/dialog';
 
 export default function Home() {
   const [selected, setSelected] = useState<Album | undefined>();
@@ -17,9 +21,9 @@ export default function Home() {
   const closePopup = () => setSelected(undefined);
 
   return (
-    <div className="p-8 space-y-8">
+    <div className="p-8 space-y-8 bg-white min-h-screen">
       <VinylPlayer album={selected} playing={!!selected} />
-      <div className="grid grid-cols-2 gap-8">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-8">
         {albums.map((album) => (
           <AlbumCard
             key={album.id}
@@ -32,20 +36,19 @@ export default function Home() {
           />
         ))}
       </div>
-
-      {selected && (
-        <div
-          className="fixed inset-0 bg-black/50 flex items-center justify-center"
-          onClick={closePopup}
-        >
-          <div className="bg-white text-black p-4 max-w-md space-y-2">
-            <h2 className="text-xl font-bold">{selected.title}</h2>
-            <p>{selected.description}</p>
-            <p className="font-semibold">My thoughts:</p>
-            <p>{selected.comment}</p>
-          </div>
-        </div>
-      )}
+      <Dialog open={!!selected} onOpenChange={closePopup}>
+        <DialogContent className="text-black space-y-2">
+          {selected && (
+            <>
+              <h2 className="text-xl font-bold">{selected.title}</h2>
+              <p className="text-sm text-gray-600">{selected.artist}</p>
+              <p>{selected.description}</p>
+              <p className="font-semibold">My thoughts:</p>
+              <p>{selected.comment}</p>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
