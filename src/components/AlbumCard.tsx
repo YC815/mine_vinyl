@@ -269,7 +269,7 @@ const AlbumCard: FC<Props> = ({
         />
       </motion.div>
       
-      {/* 黑膠唱片 */}
+      {/* 3. 黑膠唱片 - 在圓盤上方，唱臂下方 */}
       <AnimatePresence>
         {active && (
           <motion.div
@@ -321,7 +321,7 @@ const AlbumCard: FC<Props> = ({
                 repeating-radial-gradient(circle, transparent 0, transparent 5px, rgba(255,255,255,0.08) 7px, transparent 8px)
               `,
               boxShadow: '0 4px 16px rgba(0,0,0,0.3)',
-              zIndex: 4,
+              zIndex: 30, // 唱片在圓盤(z-index: 20)上方，唱臂(z-index: 40)下方
               overflow: 'visible',
             }}
           >
@@ -336,7 +336,7 @@ const AlbumCard: FC<Props> = ({
                 borderRadius: '50%',
                 transform: 'translate(-50%, -50%)',
                 boxShadow: '0 0 0 2px #222',
-                zIndex: 2,
+                zIndex: 31,
                 overflow: 'hidden'
               }}
             >
@@ -357,7 +357,7 @@ const AlbumCard: FC<Props> = ({
                 background: '#eee',
                 borderRadius: '50%',
                 transform: 'translate(-50%, -50%)',
-                zIndex: 3,
+                zIndex: 32,
                 boxShadow: '0 0 2px #888',
               }}
             />
