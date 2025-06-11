@@ -5,10 +5,9 @@ import { Album } from './AlbumCard';
 interface TurntablePlayerProps {
   album?: Album;
   playing: boolean;
-  onPlatterReady?: () => void;
 }
 
-const TurntablePlayer: FC<TurntablePlayerProps> = ({ album, playing, onPlatterReady }) => {
+const TurntablePlayer: FC<TurntablePlayerProps> = ({ album, playing }) => {
   const audioRef = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
@@ -23,7 +22,7 @@ const TurntablePlayer: FC<TurntablePlayerProps> = ({ album, playing, onPlatterRe
 
   return (
     <div className="w-full flex flex-col items-center justify-center py-8">
-      <div className="relative w-[500px] h-[280px] bg-zinc-900 rounded-sm shadow-xl">
+      <div className="relative w-[500px] h-[280px] bg-zinc-900 rounded-sm shadow-xl" style={{ zIndex: 1 }}>
         {/* 唱盤機身 */}
         <div className="absolute top-0 left-0 w-full h-full bg-zinc-900 rounded-sm border border-zinc-800" style={{ zIndex: 1 }}>
           {/* 唱盤基座 */}
@@ -37,10 +36,11 @@ const TurntablePlayer: FC<TurntablePlayerProps> = ({ album, playing, onPlatterRe
             <div 
               className="absolute top-[50%] left-[50%] w-64 h-64 -translate-x-1/2 -translate-y-1/2 rounded-full bg-zinc-800 border border-zinc-700"
               id="platter-base"
-              style={{ zIndex: 2 }}
+              style={{ zIndex: 3 }}
             >
               {/* 轉盤表面（唱片放置處） */}
-              <div className="absolute top-1/2 left-1/2 w-[90%] h-[90%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-zinc-900 border border-zinc-700">
+              <div className="absolute top-1/2 left-1/2 w-[90%] h-[90%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-zinc-900 border border-zinc-700"
+                style={{ zIndex: 4 }}>
                 {/* 中心點 */}
                 <div className="absolute top-1/2 left-1/2 w-2 h-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-zinc-400"></div>
                 
