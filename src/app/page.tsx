@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import albums from '@/data/albums.json';
 import AlbumCard, { Album } from '@/components/AlbumCard';
-import VinylPlayer from '@/components/VinylPlayer';
+import TurntablePlayer from '@/components/TurntablePlayer';
 import {
   Dialog,
   DialogContent,
@@ -15,10 +15,16 @@ export default function Home() {
   const [playerPosition, setPlayerPosition] = useState({ x: 0, y: 0 });
   const [showDialog, setShowDialog] = useState(false);
   const playerRef = useRef<HTMLDivElement>(null);
+  const [recordReachedPlayer, setRecordReachedPlayer] = useState(false);
 
   useEffect(() => {
     if (selected) {
       window.scrollTo({ top: 0, behavior: 'smooth' });
+      // 重置唱片到達狀態
+      setRecordReachedPlayer(false);
+    } else {
+      // 重置唱片到達狀態
+      setRecordReachedPlayer(false);
     }
   }, [selected]);
 
@@ -26,10 +32,21 @@ export default function Home() {
   useEffect(() => {
     const calculatePlayerPosition = () => {
       if (playerRef.current) {
-        const rect = playerRef.current.getBoundingClientRect();
-        const centerX = rect.left + (rect.width / 2);
-        const centerY = rect.top + (rect.height / 2) - 95;
-        setPlayerPosition({ x: centerX, y: centerY });
+        // 尋找轉盤中心點元素
+        const platterBase = playerRef.current.querySelector('#platter-base');
+        if (platterBase) {
+          const platterRect = platterBase.getBoundingClientRect();
+          const centerX = platterRect.left + (platterRect.width / 2);
+          // 向上微調 10px
+          const centerY = platterRect.top + (platterRect.height / 2) - 10;
+          setPlayerPosition({ x: centerX, y: centerY });
+        } else {
+          const rect = playerRef.current.getBoundingClientRect();
+          // 如果找不到轉盤元素，使用預設計算
+          const centerX = rect.left + (rect.width / 2);
+          const centerY = rect.top + (rect.height / 2);
+          setPlayerPosition({ x: centerX, y: centerY });
+        }
       }
     };
 
@@ -51,10 +68,17 @@ export default function Home() {
     setShowDialog(true);
   };
 
+  const handleRecordReachedPlayer = () => {
+    setRecordReachedPlayer(true);
+  };
+
   return (
     <div className="p-8 space-y-8 bg-white min-h-screen">
       <div ref={playerRef}>
-        <VinylPlayer album={selected} playing={!!selected} />
+        <TurntablePlayer 
+          album={selected} 
+          playing={recordReachedPlayer}
+        />
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 lg:gap-8">
         {albums.map((album) => (
@@ -68,6 +92,7 @@ export default function Home() {
             }}
             onAnimationComplete={handleAnimationComplete}
             playerPosition={playerPosition}
+            onRecordReachedPlayer={handleRecordReachedPlayer}
           />
         ))}
       </div>

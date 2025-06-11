@@ -1,5 +1,5 @@
 import { FC, useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence, useSpring, useTransform, useMotionValue } from "framer-motion";
+import { motion, AnimatePresence, useSpring, useTransform, useMotionValue, useMotionTemplate } from "framer-motion";
 import Image from "next/image";
 
 export interface Album {
@@ -18,6 +18,7 @@ interface Props {
   active: boolean;
   onSelect: () => void;
   onAnimationComplete?: () => void;
+  onRecordReachedPlayer?: () => void;
   playerPosition?: { x: number; y: number };
 }
 
@@ -34,6 +35,7 @@ const AlbumCard: FC<Props> = ({
   active, 
   onSelect, 
   onAnimationComplete,
+  onRecordReachedPlayer,
   playerPosition = { x: 0, y: 0 }
 }) => {
   const [animationStage, setAnimationStage] = useState<AnimationStage>(AnimationStage.INITIAL);
@@ -91,6 +93,10 @@ const AlbumCard: FC<Props> = ({
       switch (animationStage) {
         case AnimationStage.RECORD_TO_PLAYER:
           setAnimationStage(AnimationStage.SPINNING);
+          // 通知唱片已經到達播放器
+          if (onRecordReachedPlayer) {
+            onRecordReachedPlayer();
+          }
           break;
         case AnimationStage.SPINNING:
           if (onAnimationComplete) {
@@ -156,33 +162,26 @@ const AlbumCard: FC<Props> = ({
   );
 
   // 計算合成的陰影效果
-  const boxShadow = useTransform(
-    [shadowX, shadowY, shadowBlur, translateZ, lightIntensity],
-    ([latestX, latestY, latestBlur, latestZ, latestIntensity]: [number, number, number, number, number]) => {
-      const shadowColor = isDarkMode
-        ? `rgba(255, 255, 255, ${latestIntensity * 0.5})`
-        : `rgba(0, 0, 0, 0.5)`;
+  const boxShadow = useMotionTemplate`${shadowX}px ${shadowY}px ${shadowBlur}px ${useTransform(lightIntensity, latest => {
+    const shadowColor = isDarkMode
+      ? `rgba(255, 255, 255, ${latest * 0.5})`
+      : `rgba(0, 0, 0, 0.5)`;
+    
+    const edgeShadow = isDarkMode && isHovered
+      ? `, 0px 0px 3px rgba(255, 255, 255, 0.5), inset 0 0 0 1px rgba(255, 255, 255, 0.2)`
+      : '';
+    const ambientLight = isDarkMode && isHovered
+      ? `, 0 0 20px 5px rgba(255, 255, 255, 0.15)`
+      : '';
+    const baseShadowOpacity = isDarkMode ? (isHovered ? 0.35 : 0) : (isHovered ? 0.35 : 0.15);
+    const shadowSize = isHovered ? 8 : 6;
+    const shadowOffset = isHovered ? 3 : 2;
+    const lightModeAmbient = !isDarkMode
+      ? `, 0 4px 15px rgba(0, 0, 0, ${isHovered ? 0.12 : 0.08})`
+      : '';
 
-      const intensity = isHovered ? 1.5 : 1.2;
-      const edgeShadow = isDarkMode && isHovered
-        ? `, 0px 0px 3px rgba(255, 255, 255, 0.5), inset 0 0 0 1px rgba(255, 255, 255, 0.2)`
-        : '';
-      const ambientLight = isDarkMode && isHovered
-        ? `, 0 0 20px 5px rgba(255, 255, 255, 0.15)`
-        : '';
-      const baseShadowOpacity = isDarkMode ? (isHovered ? 0.35 : 0) : (isHovered ? 0.35 : 0.15);
-      const shadowSize = isHovered ? 8 : 6;
-      const shadowOffset = isHovered ? 3 : 2;
-      const lightModeAmbient = !isDarkMode
-        ? `, 0 4px 15px rgba(0, 0, 0, ${isHovered ? 0.12 : 0.08})`
-        : '';
-
-      return `
-        ${-latestX * 0.5}px ${-latestY * 0.5}px ${latestBlur * 0.7 * intensity}px ${shadowColor},
-        0px ${shadowOffset + latestZ * 0.2}px ${shadowSize + latestZ}px rgba(${isDarkMode ? '255, 255, 255' : '0, 0, 0'}, ${baseShadowOpacity})${edgeShadow}${ambientLight}${lightModeAmbient}
-      `;
-    }
-  );
+    return `${shadowColor}, 0px ${shadowOffset + translateZ.get() * 0.2}px ${shadowSize + translateZ.get()}px rgba(${isDarkMode ? '255, 255, 255' : '0, 0, 0'}, ${baseShadowOpacity})${edgeShadow}${ambientLight}${lightModeAmbient}`;
+  })}`;
 
   const position = getAnimationPosition();
 
@@ -280,6 +279,7 @@ const AlbumCard: FC<Props> = ({
               y: position.y,
               opacity: 1,
               rotate: animationStage === AnimationStage.SPINNING ? 360 : 0,
+              scale: animationStage === AnimationStage.SPINNING ? 1.4 : 1,
             }}
             transition={{
               x: {
@@ -294,10 +294,17 @@ const AlbumCard: FC<Props> = ({
                 damping: 30,
                 duration: 0.2
               },
+              scale: {
+                type: 'spring',
+                stiffness: 300,
+                damping: 25,
+                duration: 0.3
+              },
               rotate: animationStage === AnimationStage.SPINNING ? {
                 duration: 1.5,
                 repeat: Infinity,
-                ease: "linear"
+                ease: "linear",
+                repeatType: "loop"
               } : {
                 duration: 0.5,
                 ease: "easeInOut"
@@ -314,25 +321,31 @@ const AlbumCard: FC<Props> = ({
                 repeating-radial-gradient(circle, transparent 0, transparent 5px, rgba(255,255,255,0.08) 7px, transparent 8px)
               `,
               boxShadow: '0 4px 16px rgba(0,0,0,0.3)',
-              zIndex: 0,
+              zIndex: 4,
               overflow: 'visible',
             }}
           >
-            {/* 中心黃色標籤 */}
+            {/* 中心封面圖片 */}
             <div
               style={{
                 position: 'absolute',
                 top: '50%',
                 left: '50%',
-                width: 48,
-                height: 48,
-                background: '#ffe066',
+                width: 60,
+                height: 60,
                 borderRadius: '50%',
                 transform: 'translate(-50%, -50%)',
                 boxShadow: '0 0 0 2px #222',
                 zIndex: 2,
+                overflow: 'hidden'
               }}
-            />
+            >
+              <img
+                src={album.cover}
+                alt={album.title}
+                className="w-full h-full object-cover"
+              />
+            </div>
             {/* 唱片中心孔 */}
             <div
               style={{
